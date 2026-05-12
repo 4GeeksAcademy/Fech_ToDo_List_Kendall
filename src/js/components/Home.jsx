@@ -61,8 +61,12 @@ const Home = () => {
 					</ul>
 
 				</div>
+				<div className="container text-muted ">
+					{list.length === 0 ? "No hay tareas, añadir tareas" : null}
+				</div>
 				<div className="card-footer text-muted small">
 					{list.length} {list.length === 1 ? "item" : "items"} left
+					
 				</div>
 			</div>
 		</div>
