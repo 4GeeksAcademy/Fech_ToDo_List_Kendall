@@ -53,7 +53,7 @@ const Home = () => {
 											setList(list.filter((listItem) => listItem.key !== item.key))
 										}
 									>
-										{beVisible === item.key && <FontAwesomeIcon icon={faTrash} />}
+										<FontAwesomeIcon icon={faTrash} />
 									</button>
 								)}
 							</li>
