@@ -4,36 +4,21 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 
 
-
-
-
 const Home = () => {
-	const [inputValue, setInputValue] = useState("");
-	const [list, setList] = useState([]);
-	const [beVisible, setBeVisible] = useState(null);
-	const idCounter = useRef(0)
+	const [inputValue, setInputValue] = useState("")
+	const [list, setList] = useState([])
+	const [beVisible, setBeVisible] = useState(null)
 
 	useEffect(() => {
-
-		const raw = "";
-
-		const requestOptions = {
-			method: "POST",
-			body: raw,
-			redirect: "follow"
-		};
-
-		fetch("https://playground.4geeks.com/todo/users/kendallsh", requestOptions)
-			.then((response) => response.text())
-			.then((result) => console.log(result))
-			.catch((error) => console.error(error));
 
 		const getContent = async () => {
 
 			try {
-				let response = await fetch("https://playground.4geeks.com/todo/users/kendallsh")
-				let data = await response.json()
-				setList(data.todos)
+				const response = await fetch("https://playground.4geeks.com/todo/users/kendallsh")
+				if (!response.ok) throw new Error(`Error HTTP: ${response.status}`)
+
+				const data = await response.json()
+				setList(data.todos || [])
 			} catch (error) {
 				console.error(error);
 			}
@@ -42,37 +27,42 @@ const Home = () => {
 	}, [])
 
 	const addTodo = async (input) => {
-		const myHeaders = new Headers();
-		myHeaders.append("Content-Type", "application/json");
+		try {
+			const response = await fetch('https://playground.4geeks.com/todo/todos/kendallsh', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ label: input, is_done: false })
+			});
+			if (!response.ok) throw new Error(`Error al crear: ${response.status}`);
 
-		const raw = JSON.stringify({
-			"label": input,
-			"is_done": false
-		});
+			const data = await response.json();
+			return data;
+			console.log('Task create:', data);
+		} catch (error) {
+			console.error('Error en el POST:', error.message);
+			throw error
+		}
+	};
 
-		const requestOptions = {
-			method: "POST",
-			headers: myHeaders,
-			body: raw,
-			redirect: "follow"
-		};
-
-		fetch("https://playground.4geeks.com/todo/todos/kendallsh", requestOptions)
-			.then((response) => response.text())
-			.then((result) => console.log(result))
-			.catch((error) => console.error(error));
-	}
-
-
-	const handleSubmit = (evn) => {
+	const handleSubmit = async (evn) => {
 		evn.preventDefault();
 		if (inputValue.trim() === "") return;
-		setInputValue("");
-		setList([
-			...list,
-			{ key: idCounter.current++, value: inputValue }
 
-		]);
+		const currentInput = inputValue;
+		setInputValue("");
+
+		try {
+
+			const newTodoFromServer = await addTodo(currentInput);
+
+			setList([
+				...list,
+				newTodoFromServer
+			]);
+		} catch (error) {
+			console.error("No se pudo guardar en el servidor:", error);
+			setInputValue(currentInput); // Opcional: recupera el texto si falló
+		}
 	}
 
 	return (
@@ -92,17 +82,17 @@ const Home = () => {
 					</form>
 					<ul className="list-group gap-2">
 						{list.map((item) => (
-							<li key={item.key}
+							<li key={item.id}
 								className="list-group-item d-flex justify-content-between align-items-center"
-								onMouseEnter={() => setBeVisible(item.key)}
+								onMouseEnter={() => setBeVisible(item.id)}
 								onMouseLeave={() => setBeVisible(null)}
 							>
 								{item.label}
-								{beVisible === item.key && (
+								{beVisible === item.id && (
 									<button
 										className="btn btn-sm btn-outline-danger border-0"
 										onClick={() =>
-											setList(list.filter((listItem) => listItem.key !== item.key))
+											setList(list.filter((listItem) => listItem.id !== item.id))
 										}
 									>
 										<FontAwesomeIcon icon={faTrash} />
