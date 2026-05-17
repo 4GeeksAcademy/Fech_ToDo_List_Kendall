@@ -3,10 +3,10 @@ import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 
-const Task = ({id, label, onDelete}) => {
+const Task = ({ id, label, onDelete }) => {
 	const [beVisible, setBeVisible] = useState(false)
 
-	return <li key={id}
+	return <li
 		className="list-group-item d-flex justify-content-between align-items-center"
 		onMouseEnter={() => setBeVisible(true)}
 		onMouseLeave={() => setBeVisible(false)}
@@ -32,6 +32,12 @@ const Home = () => {
 		const getContent = async () => {
 
 			try {
+
+				await fetch("https://playground.4geeks.com/todo/users/kendallsh", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" }
+				})
+
 				const response = await fetch("https://playground.4geeks.com/todo/users/kendallsh")
 				if (!response.ok) throw new Error(`Error HTTP: ${response.status}`)
 
@@ -51,7 +57,7 @@ const Home = () => {
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ label: input, is_done: false })
 			});
-			if (!response.ok) throw new Error(`Error al crear: ${response.status}`);
+			if (!response.ok) throw new Error(`Error al crear: ${response.status}`)
 
 			const data = await response.json();
 			console.log('Task create:', data);
@@ -65,10 +71,10 @@ const Home = () => {
 	const deleteTodo = async (todoId) => {
 
 		try {
-			const response = await fetch(`https://playground.4geeks.com/todo/todos/${todoId}`,{
+			const response = await fetch(`https://playground.4geeks.com/todo/todos/${todoId}`, {
 				method: "DELETE"
 			});
-			if (!response.ok) throw new Error(`Error al eliminar: ${response.status}`);
+			if (!response.ok) throw new Error(`Error al eliminar: ${response.status}`)
 
 			setList(list.filter((listItem) => listItem.id !== todoId))
 		} catch (error) {
@@ -92,7 +98,7 @@ const Home = () => {
 				newTodoFromServer
 			]);
 		} catch (error) {
-			console.error("No se pudo guardar en el servidor:", error);
+			console.error("No se pudo guardar en el servidor:", error)
 			setInputValue(currentInput);
 		}
 	}
@@ -114,9 +120,9 @@ const Home = () => {
 					</form>
 					<ul className="list-group gap-2">
 						{list.map((item) => (
-							<Task 
-								key={item.id} 
-								id={item.id} 
+							<Task
+								key={item.id}
+								id={item.id}
 								label={item.label}
 								onDelete={deleteTodo}
 							/>
