@@ -81,6 +81,28 @@ const Home = () => {
 			console.error('Error en el DELETE:', error.message);
 		}
 	}
+	
+	const deleteAll = async () => {
+
+		try {
+			const response = await fetch("https://playground.4geeks.com/todo/users/kendallsh" , {
+				method: "DELETE"
+			})
+			if (!response.ok) throw new Error(`Error al eliminar: ${response.status}`)
+			
+			setList([])
+
+			await fetch("https://playground.4geeks.com/todo/users/kendallsh", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" }
+				})
+
+			console.log("Todas las tareas fueron eliminadas.");
+
+		} catch (error) {
+			console.error('Error al eliminar todas las tareas:', error.message);
+		}
+	}
 
 	const handleSubmit = async (evn) => {
 		evn.preventDefault();
@@ -134,7 +156,16 @@ const Home = () => {
 					{list.length === 0 ? "No hay tareas, añadir tareas" : null}
 				</div>
 				<div className="card-footer text-muted small">
+					<div className="container-fluid">
 					{list.length} {list.length === 1 ? "item" : "items"} left
+					<button
+						type="button"
+						class="btn btn-danger m-4"
+						onClick={deleteAll}
+					>
+						DeleteAll
+					</button>
+					</div>
 
 				</div>
 			</div>
