@@ -1,13 +1,31 @@
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 
+const Task = ({id, label, onDelete}) => {
+	const [beVisible, setBeVisible] = useState(false)
+
+	return <li key={id}
+		className="list-group-item d-flex justify-content-between align-items-center"
+		onMouseEnter={() => setBeVisible(true)}
+		onMouseLeave={() => setBeVisible(false)}
+	>
+		{label}
+		{beVisible && <button
+			className="btn btn-sm btn-outline-danger border-0"
+			onClick={() => onDelete(id)
+			}
+		>
+			<FontAwesomeIcon icon={faTrash} />
+		</button>
+		}
+	</li>
+}
 
 const Home = () => {
 	const [inputValue, setInputValue] = useState("")
 	const [list, setList] = useState([])
-	const [beVisible, setBeVisible] = useState(null)
 
 	useEffect(() => {
 
@@ -36,13 +54,27 @@ const Home = () => {
 			if (!response.ok) throw new Error(`Error al crear: ${response.status}`);
 
 			const data = await response.json();
-			return data;
 			console.log('Task create:', data);
+			return data;
 		} catch (error) {
 			console.error('Error en el POST:', error.message);
 			throw error
 		}
 	};
+
+	const deleteTodo = async (todoId) => {
+
+		try {
+			const response = await fetch(`https://playground.4geeks.com/todo/todos/${todoId}`,{
+				method: "DELETE"
+			});
+			if (!response.ok) throw new Error(`Error al eliminar: ${response.status}`);
+
+			setList(list.filter((listItem) => listItem.id !== todoId))
+		} catch (error) {
+			console.error('Error en el DELETE:', error.message);
+		}
+	}
 
 	const handleSubmit = async (evn) => {
 		evn.preventDefault();
@@ -61,7 +93,7 @@ const Home = () => {
 			]);
 		} catch (error) {
 			console.error("No se pudo guardar en el servidor:", error);
-			setInputValue(currentInput); // Opcional: recupera el texto si falló
+			setInputValue(currentInput);
 		}
 	}
 
@@ -82,23 +114,12 @@ const Home = () => {
 					</form>
 					<ul className="list-group gap-2">
 						{list.map((item) => (
-							<li key={item.id}
-								className="list-group-item d-flex justify-content-between align-items-center"
-								onMouseEnter={() => setBeVisible(item.id)}
-								onMouseLeave={() => setBeVisible(null)}
-							>
-								{item.label}
-								{beVisible === item.id && (
-									<button
-										className="btn btn-sm btn-outline-danger border-0"
-										onClick={() =>
-											setList(list.filter((listItem) => listItem.id !== item.id))
-										}
-									>
-										<FontAwesomeIcon icon={faTrash} />
-									</button>
-								)}
-							</li>
+							<Task 
+								key={item.id} 
+								id={item.id} 
+								label={item.label}
+								onDelete={deleteTodo}
+							/>
 						))}
 					</ul>
 
