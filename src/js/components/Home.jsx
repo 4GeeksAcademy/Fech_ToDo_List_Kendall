@@ -7,7 +7,7 @@ const Task = ({ id, label, onDelete }) => {
 	const [beVisible, setBeVisible] = useState(false)
 
 	return <li
-		className="list-group-item d-flex justify-content-between align-items-center"
+		className="list-group-item d-flex justify-content-between align-items-center p-0 fs-2 opacity-75 border border-0"
 		onMouseEnter={() => setBeVisible(true)}
 		onMouseLeave={() => setBeVisible(false)}
 	>
@@ -81,21 +81,21 @@ const Home = () => {
 			console.error('Error en el DELETE:', error.message);
 		}
 	}
-	
+
 	const deleteAll = async () => {
 
 		try {
-			const response = await fetch("https://playground.4geeks.com/todo/users/kendallsh" , {
+			const response = await fetch("https://playground.4geeks.com/todo/users/kendallsh", {
 				method: "DELETE"
 			})
 			if (!response.ok) throw new Error(`Error al eliminar: ${response.status}`)
-			
+
 			setList([])
 
 			await fetch("https://playground.4geeks.com/todo/users/kendallsh", {
-					method: "POST",
-					headers: { "Content-Type": "application/json" }
-				})
+				method: "POST",
+				headers: { "Content-Type": "application/json" }
+			})
 
 			console.log("Todas las tareas fueron eliminadas.");
 
@@ -126,16 +126,17 @@ const Home = () => {
 	}
 
 	return (
-		<div className="d-flex justify-content-center mt-5">
-			<div className="card shadow-sm d-inline-block">
+		<div className="d-flex justify-content-center mt-5 flex-column">
+			<h1 className="text-center mb-4 display-1 text-body-tertiary opacity-25">
+				todos
+			</h1>
+			<div className="container card shadow-sm">
 				<div className="card-body">
-
-					<h2 className="text-center mb-4">To-Do List</h2>
-
 					<form onSubmit={handleSubmit}>
 						<input
 							type="text"
-							className="form-control form-control-lg mb-4"
+							className="form-control form-control-lg mb-4 opacity-75 fs-2"
+							placeholder="What's needs to be done?"
 							value={inputValue}
 							onChange={(evn) => setInputValue(evn.target.value)}
 						/>
@@ -153,20 +154,19 @@ const Home = () => {
 
 				</div>
 				<div className="container text-muted ">
-					{list.length === 0 ? "No hay tareas, añadir tareas" : null}
+					{list.length === 0 ? "There are no tasks, add tasks" : null}
 				</div>
 				<div className="card-footer text-muted small">
-					<div className="container-fluid">
-					{list.length} {list.length === 1 ? "item" : "items"} left
-					<button
-						type="button"
-						class="btn btn-danger m-4"
-						onClick={deleteAll}
-					>
-						DeleteAll
-					</button>
+					<div className="container-fluid opacity-75">
+						{list.length} {list.length === 1 ? "item" : "items"} left
+						<button
+							type="button"
+							class="btn btn-danger m-4"
+							onClick={deleteAll}
+						>
+							DeleteAll
+						</button>
 					</div>
-
 				</div>
 			</div>
 		</div>
